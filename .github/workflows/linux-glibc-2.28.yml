@@ -1,0 +1,58 @@
+name: Linux glibc 2.28 binary
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/linux-glibc-2.28]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build on glibc 2.28
+        run: |
+          docker run --rm -v "$PWD:/work" -w /work \
+            quay.io/pypa/manylinux_2_28_x86_64 bash -ec '
+              test "$(getconf GNU_LIBC_VERSION)" = "glibc 2.28"
+              yum install -y fontconfig-devel libX11-devel libXi-devel \
+                libXcursor-devel libXrandr-devel libxcb-devel mesa-libGL-devel \
+                wayland-devel dbus-devel openssl-devel clang clang-devel llvm-devel
+              export PATH="/opt/python/cp313-cp313/bin:$PATH"
+              python3 -m pip install "cmake>=3.16,<4" ninja
+              curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs -o /tmp/rustup-init.sh
+              sh /tmp/rustup-init.sh -y --profile minimal
+              export PATH="/root/.cargo/bin:$PATH"
+              export RUSTFLAGS="-C target-cpu=x86-64"
+              export CC=clang CXX=clang++
+              export CFLAGS="-march=x86-64 --gcc-toolchain=$DEVTOOLSET_ROOTPATH/usr"
+              export CXXFLAGS="$CFLAGS"
+              export BINDGEN_EXTRA_CLANG_ARGS="--gcc-toolchain=$DEVTOOLSET_ROOTPATH/usr"
+              export SKIA_GN_ARGS="extra_cflags += [\"-march=x86-64\", \"--gcc-toolchain=$DEVTOOLSET_ROOTPATH/usr\"]"
+              printf "#include <bit>\n" | clang++ $CXXFLAGS -std=c++20 -x c++ -fsyntax-only -
+              export FORCE_SKIA_BUILD=1
+              git config --global --add safe.directory /work
+              cargo build --locked --release
+              python3 ubuntu-builder/package-glibc-2.28.py
+            '
+          sudo chown -R "$(id -u):$(id -g)" target
+      - name: Test package on AlmaLinux 8
+        run: |
+          mkdir -p target/check-linux
+          tar -xzf target/artifacts/neovide-linux-x86_64-glibc-2.28.tar.gz -C target/check-linux
+          docker run --rm -v "$PWD/target/check-linux:/package:ro" almalinux:8 sh -ec '
+            test "$(getconf GNU_LIBC_VERSION)" = "glibc 2.28"
+            /package/neovide-linux-x86_64/neovide --version
+            /package/neovide-linux-x86_64/neovide --help
+          '
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neovide-linux-x86_64-glibc-2.28
+          path: target/artifacts/*
+          if-no-files-found: error

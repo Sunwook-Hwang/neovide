@@ -31,7 +31,7 @@ glxinfo -B > "$evidence/opengl.txt"
 grep -i 'OpenGL renderer string: llvmpipe' "$evidence/opengl.txt"
 
 timeout 40s "$root/target/cpu-rendering/package/neovide-linux-x86_64/neovide" \
-    --no-fork --neovim-bin "$root/target/cpu-rendering/neovim/build/bin/nvim" \
+    --no-fork --size 1200x760 --neovim-bin "$root/target/cpu-rendering/neovim/build/bin/nvim" \
     -- -u "$root/ubuntu-builder/cpu-rendering-smoke.lua" -i NONE --noplugin \
     > "$evidence/neovide.log" 2>&1 &
 neovide_pid=$!
@@ -49,5 +49,5 @@ import -window root "$evidence/cpu-rendering.png"
 test -f "$NEOVIDE_CPU_REPORT"
 wait "$neovide_pid"
 cat "$NEOVIDE_CPU_REPORT"
-grep -q '"success":true' "$NEOVIDE_CPU_REPORT"
+grep -Eq '"success":[[:space:]]*true' "$NEOVIDE_CPU_REPORT"
 printf '\nCPU rendering GUI smoke test passed.\n'

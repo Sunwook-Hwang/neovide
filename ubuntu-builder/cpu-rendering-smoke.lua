@@ -1,4 +1,4 @@
-vim.o.guifont = "DejaVu Sans Mono:h18"
+vim.o.guifont = "DejaVu Sans Mono:h14"
 vim.o.swapfile = false
 vim.o.number = true
 vim.o.laststatus = 2

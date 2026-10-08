@@ -34,7 +34,7 @@ jobs:
               export CFLAGS="-march=x86-64 --gcc-toolchain=$DEVTOOLSET_ROOTPATH/usr"
               export CXXFLAGS="$CFLAGS"
               export BINDGEN_EXTRA_CLANG_ARGS="--gcc-toolchain=$DEVTOOLSET_ROOTPATH/usr"
-              export SKIA_GN_ARGS="extra_cflags=[\"-march=x86-64\", \"--gcc-toolchain=$DEVTOOLSET_ROOTPATH/usr\"]"
+              export SKIA_GN_ARGS="extra_cflags += [\"-march=x86-64\", \"--gcc-toolchain=$DEVTOOLSET_ROOTPATH/usr\"]"
               printf "#include <bit>\n" | clang++ $CXXFLAGS -std=c++20 -x c++ -fsyntax-only -
               export FORCE_SKIA_BUILD=1
               git config --global --add safe.directory /work

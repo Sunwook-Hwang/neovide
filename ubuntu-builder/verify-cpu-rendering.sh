@@ -30,7 +30,7 @@ glxinfo -B > "$evidence/opengl.txt"
 grep -i 'OpenGL renderer string: llvmpipe' "$evidence/opengl.txt"
 
 timeout 40s "$root/target/cpu-rendering/package/neovide-linux-x86_64/neovide" \
-    --no-fork --neovim-bin "$root/target/cpu-rendering/reovim/rust-neovim-linux-x86_64/rvi" \
+    --no-fork --neovim-bin "$root/target/cpu-rendering/neovim/build/bin/nvim" \
     -- -u "$root/ubuntu-builder/cpu-rendering-smoke.lua" -i NONE --noplugin \
     > "$evidence/neovide.log" 2>&1 &
 neovide_pid=$!

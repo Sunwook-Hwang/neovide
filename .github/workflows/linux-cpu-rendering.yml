@@ -23,21 +23,19 @@ jobs:
           run-id: 37772327548
           github-token: ${{ github.token }}
           path: target/cpu-rendering/package
-      - name: Download published reovim
-        run: |
-          mkdir -p target/cpu-rendering/reovim
-          cd target/cpu-rendering/reovim
-          base=https://github.com/Sunwook-Hwang/rust-neovim/releases/download/v0.1.0-experimental.17
-          curl -fL --retry 3 "$base/rust-neovim-linux-x86_64.tar.gz" -o rust-neovim-linux-x86_64.tar.gz
-          curl -fL --retry 3 "$base/SHA256SUMS" -o SHA256SUMS
-          grep '  rust-neovim-linux-x86_64.tar.gz$' SHA256SUMS | sha256sum -c -
-          tar -xzf rust-neovim-linux-x86_64.tar.gz
       - name: Render with CPU on glibc 2.28 without a GPU
         run: |
           docker run --rm -v "$PWD:/work" -w /work almalinux:8 bash -ec '
             yum install -y epel-release
             yum install -y xorg-x11-server-Xvfb xorg-x11-utils mesa-dri-drivers \
-              mesa-libGL mesa-libEGL glx-utils dejavu-sans-mono-fonts ImageMagick
+              mesa-libGL mesa-libEGL glx-utils dejavu-sans-mono-fonts ImageMagick \
+              git gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ make unzip \
+              python39 python39-pip
+            export PATH="/opt/rh/gcc-toolset-14/root/usr/bin:$PATH"
+            python3.9 -m pip install "cmake>=3.16,<4" ninja
+            git clone --depth 1 --branch v0.11.5 https://github.com/neovim/neovim.git target/cpu-rendering/neovim
+            make -C target/cpu-rendering/neovim CMAKE_BUILD_TYPE=Release \
+              CMAKE_EXTRA_FLAGS="-DENABLE_LIBINTL=OFF" -j2
             bash ubuntu-builder/verify-cpu-rendering.sh
           '
       - uses: actions/upload-artifact@v4

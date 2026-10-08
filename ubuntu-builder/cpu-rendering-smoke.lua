@@ -2,7 +2,7 @@ vim.o.guifont = "DejaVu Sans Mono:h18"
 vim.o.swapfile = false
 vim.o.number = true
 vim.o.laststatus = 2
-vim.o.statusline = " CPU RENDERING | llvmpipe | glibc 2.28 | reovim "
+vim.o.statusline = " CPU RENDERING | llvmpipe | glibc 2.28 | Neovim "
 vim.api.nvim_set_hl(0, "Normal", { fg = "#e8edf5", bg = "#182b49" })
 vim.api.nvim_set_hl(0, "StatusLine", { fg = "#102030", bg = "#64dca0" })
 vim.api.nvim_set_hl(0, "LineNr", { fg = "#f4c36a", bg = "#182b49" })
@@ -17,7 +17,7 @@ vim.defer_fn(function()
     "Renderer: Mesa llvmpipe (CPU)",
     "GPU devices: none",
     "Runtime: AlmaLinux 8 / glibc 2.28",
-    "Editor: published reovim experimental.17",
+    "Editor: official Neovim 0.11.5",
     "",
     "Text, cursor, window splits and redraw are active.",
     "Unicode: café — λ → ✓",

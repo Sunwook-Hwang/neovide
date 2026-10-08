@@ -23,7 +23,7 @@ jobs:
               test "$(getconf GNU_LIBC_VERSION)" = "glibc 2.28"
               yum install -y fontconfig-devel libX11-devel libXi-devel \
                 libXcursor-devel libXrandr-devel libxcb-devel mesa-libGL-devel \
-                wayland-devel dbus-devel openssl-devel
+                wayland-devel dbus-devel openssl-devel clang clang-devel llvm-devel
               export PATH="/opt/python/cp313-cp313/bin:$PATH"
               python3 -m pip install "cmake>=3.16,<4" ninja
               curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs -o /tmp/rustup-init.sh

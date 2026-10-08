@@ -17,6 +17,7 @@ export DISPLAY=:99 LIBGL_ALWAYS_SOFTWARE=true GALLIUM_DRIVER=llvmpipe
 export XDG_RUNTIME_DIR=/tmp/neovide-cpu-runtime
 export XDG_CONFIG_HOME=/tmp/neovide-cpu-config
 export NEOVIDE_CPU_REPORT="$evidence/ui-report.json"
+export VIMRUNTIME="$root/target/cpu-rendering/neovim/runtime"
 mkdir -p "$XDG_RUNTIME_DIR" "$XDG_CONFIG_HOME"
 chmod 700 "$XDG_RUNTIME_DIR"
 Xvfb :99 -screen 0 1280x800x24 -ac > "$evidence/xvfb.log" 2>&1 &
@@ -43,9 +44,10 @@ for attempt in $(seq 1 100); do
     fi
     sleep 0.2
 done
-test -f "$NEOVIDE_CPU_REPORT"
 xwininfo -root -tree > "$evidence/windows.txt"
 import -window root "$evidence/cpu-rendering.png"
+test -f "$NEOVIDE_CPU_REPORT"
 wait "$neovide_pid"
 cat "$NEOVIDE_CPU_REPORT"
+grep -q '"success":true' "$NEOVIDE_CPU_REPORT"
 printf '\nCPU rendering GUI smoke test passed.\n'
